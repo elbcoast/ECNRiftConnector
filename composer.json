@@ -24,8 +24,8 @@
     "autoload-dev": {
         "psr-4": {
             "Ecn\\RiftConnector\\Tests\\": "tests/"
+        }
     },
     "minimum-stability": "stable",
     "target-dir": "Ecn/RiftConnector"
 }
-
