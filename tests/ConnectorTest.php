@@ -61,8 +61,15 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $client = $this->getMock('\GuzzleHttp\ClientInterface');
         $client->method('get')->willReturn($response);
 
-        $connector = new Connector($client);
-        $zoneEvents = $connector->getZoneEvents('2741');
+        $connector = $this->getMockBuilder('\Ecn\RiftConnector\Connector')
+            ->setMethods(array('getShardList'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $connector->method('getShardList')->willReturn($this->getDummyShardList()['data']);
+        $connector->__construct($client);
+
+        $zoneEvents = $connector->getZoneEvents('Bloodiron');
 
         $this->assertNotEmpty($zoneEvents);
     }
@@ -84,6 +91,45 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testGetShardByName()
+    {
+        $response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        $response->method('getStatusCode')->willReturn('200');
+        $response->method('json')->willReturn($this->getDummyShardList());
+
+        $client = $this->getMock('\GuzzleHttp\ClientInterface');
+        $client->method('get')->willReturn($response);
+
+        $connector = new Connector($client);
+
+        $shard = $connector->getShardByName('Bloodiron');
+
+        $this->assertNotNull($shard);
+        $this->assertArrayHasKey('shardId', $shard);
+        $this->assertArrayHasKey('name', $shard);
+        $this->assertEquals('2507', $shard['shardId']);
+
+    }
+
+
+    public function testGetShardByNameError()
+    {
+        $response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
+        $response->method('getStatusCode')->willReturn('200');
+        $response->method('json')->willReturn($this->getDummyShardList());
+
+        $client = $this->getMock('\GuzzleHttp\ClientInterface');
+        $client->method('get')->willReturn($response);
+
+        $connector = new Connector($client);
+
+        $shard = $connector->getShardByName('Foo');
+
+        $this->assertNull($shard);
+
+    }
+
+
     /**
      * Some dummy values
      *
@@ -93,14 +139,14 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
     {
         $data = '{
         "status":"success",
-        "data":[
-        {"shardId":2501,"name":"Blightweald","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1},
-        {"shardId":2502,"name":"Cloudborne","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
-        {"shardId":2504,"name":"Sagespire","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
-        {"shardId":2507,"name":"Bloodiron","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
-        {"shardId":2722,"name":"Zaviel","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1},
-        {"shardId":2741,"name":"Typhiria","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1}
-        ]}';
+        "data":{
+        "Blightweald":{"shardId":2501,"name":"Blightweald","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1},
+        "Cloudborne":{"shardId":2502,"name":"Cloudborne","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
+        "Sagespire":{"shardId":2504,"name":"Sagespire","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
+        "Bloodiron":{"shardId":2507,"name":"Bloodiron","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":true,"language":1},
+        "Zaviel":{"shardId":2722,"name":"Zaviel","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1},
+        "Typhiria":{"shardId":2741,"name":"Typhiria","running":false,"ready":false,"locked":false,"popLevel":0,"queueWaitTime":0,"pvp":false,"language":1}
+        }}';
 
         return json_decode($data, true);
     }

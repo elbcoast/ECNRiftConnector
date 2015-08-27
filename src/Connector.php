@@ -59,17 +59,34 @@ class Connector
 
 
     /**
+     * Finds a shard by its name
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getShardByName($name)
+    {
+        $shardList = $this->getShardList();
+
+        return array_key_exists($name, $shardList) ? $shardList[$name] : null;
+    }
+
+
+    /**
      * Returns a list of zone events for a shard
      *
-     * @param $shardId
+     * @param string $name
      *
      * @return mixed
      *
      * @throws Exception\ConnectionException
      */
-    public function getZoneEvents($shardId)
+    public function getZoneEvents($name)
     {
 
+        $shard = $this->getShardByName($name);
+        $shardId = $shard['shardId'];
         $response = $this->client->get(sprintf($this->server.self::ENDPOINT_ZONEEVENT_LIST, $shardId));
 
         if ($response->getStatusCode() == "200") {
@@ -116,7 +133,7 @@ class Connector
         $hydratedShardList = array();
 
         foreach ($shardList as $shard) {
-            $hydratedShardList[$shard['shardId']] = $shard;
+            $hydratedShardList[$shard['name']] = $shard;
         }
 
         return $hydratedShardList;
