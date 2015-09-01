@@ -95,7 +95,7 @@ class Connector
             return $json['data'];
         }
 
-        throw new Exception\ConnectionException("Unable to retrieve zone events");
+        throw new Exception\ConnectionException("Unable to retrieve zone list");
     }
 
 
