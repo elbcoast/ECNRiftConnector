@@ -69,7 +69,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $connector->method('getShardList')->willReturn($this->getDummyShardList()['data']);
         $connector->__construct($client);
 
-        $zoneEvents = $connector->getZoneEvents('Bloodiron');
+        $zoneEvents = $connector->getZones('Bloodiron');
 
         $this->assertNotEmpty($zoneEvents);
     }
@@ -87,7 +87,7 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $client->method('get')->willReturn($response);
 
         $connector = new Connector($client);
-        $connector->getZoneEvents('2741');
+        $connector->getZones('2741');
     }
 
 

@@ -74,23 +74,23 @@ class Connector
 
 
     /**
-     * Returns a list of zone events for a shard
+     * Returns the list of zones with optional events for a shard
      *
-     * @param string $name
+     * @param string $shardName
      *
      * @return mixed
      *
      * @throws Exception\ConnectionException
      */
-    public function getZoneEvents($name)
+    public function getZones($shardName)
     {
 
-        $shard = $this->getShardByName($name);
+        $shard = $this->getShardByName($shardName);
         $shardId = $shard['shardId'];
         $response = $this->client->get(sprintf($this->server.self::ENDPOINT_ZONEEVENT_LIST, $shardId));
 
         if ($response->getStatusCode() == "200") {
-            $json =  $response->json();
+            $json = $response->json();
 
             return $json['data'];
         }
@@ -100,7 +100,7 @@ class Connector
 
 
     /**
-     * Retrieves the shard list from the server, hydrates and caches it
+     * Retrieves the shard list from the server
      *
      * @return array
      *
@@ -113,7 +113,7 @@ class Connector
         if ($response->getStatusCode() == "200") {
            $json =  $response->json();
 
-            return $this->hydrateShardList($json['data']);
+            return $this->distinctShardList($json['data']);
         }
 
         throw new Exception\ConnectionException("Unable to retrieve shard list");
@@ -121,22 +121,22 @@ class Connector
 
 
     /**
-     * Hydrates the shard list into a more useful format
+     * Creates a distinct list of shards. Latest shard wins.
      *
      * @param $shardList
      *
      * @return array
      */
-    protected function hydrateShardList($shardList)
+    protected function distinctShardList($shardList)
     {
 
-        $hydratedShardList = array();
+        $distinctShardList = array();
 
         foreach ($shardList as $shard) {
-            $hydratedShardList[$shard['name']] = $shard;
+            $distinctShardList[$shard['name']] = $shard;
         }
 
-        return $hydratedShardList;
+        return $distinctShardList;
     }
 }
 
