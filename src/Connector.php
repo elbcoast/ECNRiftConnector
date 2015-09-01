@@ -2,8 +2,19 @@
 
 namespace Ecn\RiftConnector;
 
+use Ecn\RiftConnector\Exception\ShardNotFoundException;
 use GuzzleHttp\ClientInterface;
 
+/**
+ * Class Connector
+ *
+ * PHP Version 5.4
+ *
+ * @author    Pierre Groth <pierre@elbcoast.net>
+ * @copyright 2015
+ * @license   MIT
+ *
+ */
 class Connector
 {
     // Servers
@@ -64,12 +75,18 @@ class Connector
      * @param string $name
      *
      * @return mixed
+     *
+     * @throws ShardNotFoundException
      */
     public function getShardByName($name)
     {
         $shardList = $this->getShardList();
 
-        return array_key_exists($name, $shardList) ? $shardList[$name] : null;
+        if (!array_key_exists($name, $shardList)) {
+            throw new ShardNotFoundException("Unknown shard");
+        }
+
+        return $shardList[$name];
     }
 
 
@@ -139,4 +156,3 @@ class Connector
         return $distinctShardList;
     }
 }
-

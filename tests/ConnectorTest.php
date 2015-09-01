@@ -111,7 +111,9 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
 
     }
 
-
+    /**
+     *  @expectedException \Ecn\RiftConnector\Exception\ShardNotFoundException
+     */
     public function testGetShardByNameError()
     {
         $response = $this->getMock('\GuzzleHttp\Message\ResponseInterface');
@@ -124,8 +126,6 @@ class ConnectorTest extends \PHPUnit_Framework_TestCase
         $connector = new Connector($client);
 
         $shard = $connector->getShardByName('Foo');
-
-        $this->assertNull($shard);
 
     }
 
