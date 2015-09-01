@@ -8,7 +8,7 @@ ECNRiftConnector
 Install the RiftConnector via composer:
 
 ```bash
-$ composer require ecn/riftconnector:dev-master
+$ composer require ecn/riftconnector:0.1.*
 ```
 
 ## Usage
